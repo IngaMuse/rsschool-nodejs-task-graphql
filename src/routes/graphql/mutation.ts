@@ -8,9 +8,9 @@ import {
   ProfileDto,
   ProfileModel,
 } from './types/types/types.js';
-import { CreatePostInput, PostType } from './types/post.js';
-import { CreateUserInput, UserType } from './types/user.js';
-import { CreateProfileInput, ProfileType } from './types/profile.js';
+import { ChangePostInput, CreatePostInput, PostType } from './types/post.js';
+import { ChangeUserInput, CreateUserInput, UserType } from './types/user.js';
+import { ChangeProfileInput, CreateProfileInput, ProfileType } from './types/profile.js';
 import { UUID } from 'crypto';
 import { UUIDType } from './types/uuid.js';
 
@@ -36,6 +36,22 @@ export const Mutation = new GraphQLObjectType({
         return id;
       },
     },
+    changeUser: {
+      type: UserType,
+      args: {
+        id: { type: new GraphQLNonNull(UUIDType) },
+        dto: { type: new GraphQLNonNull(ChangeUserInput) },
+      },
+      resolve: async (
+        root,
+        { id, dto }: { id: UUID; dto: UserDto },
+        { prisma }: Context,
+      ) =>
+        await prisma.user.update({
+          where: { id },
+          data: dto,
+        }),
+    },
 
     createPost: {
       type: PostType,
@@ -56,6 +72,22 @@ export const Mutation = new GraphQLObjectType({
         return id;
       },
     },
+    changePost: {
+      type: PostType,
+      args: {
+        id: { type: new GraphQLNonNull(UUIDType) },
+        dto: { type: new GraphQLNonNull(ChangePostInput) },
+      },
+      resolve: async (
+        root,
+        { id, dto }: { id: UUID; dto: PostDto },
+        { prisma }: Context,
+      ) =>
+        await prisma.post.update({
+          where: { id },
+          data: dto,
+        }),
+    },
 
     createProfile: {
       type: ProfileType,
@@ -75,6 +107,22 @@ export const Mutation = new GraphQLObjectType({
         });
         return id;
       },
+    },
+    changeProfile: {
+      type: ProfileType,
+      args: {
+        id: { type: new GraphQLNonNull(UUIDType) },
+        dto: { type: new GraphQLNonNull(ChangeProfileInput) },
+      },
+      resolve: async (
+        root,
+        { id, dto }: { id: UUID; dto: ProfileDto },
+        { prisma }: Context,
+      ) =>
+        await prisma.profile.update({
+          where: { id },
+          data: dto,
+        }),
     },
   },
 });
