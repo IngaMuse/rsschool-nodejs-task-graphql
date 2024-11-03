@@ -1,4 +1,4 @@
-import { GraphQLNonNull, GraphQLObjectType } from 'graphql';
+import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql';
 import { Context } from './types/types/interface.js';
 import {
   UserDto,
@@ -123,6 +123,49 @@ export const Mutation = new GraphQLObjectType({
           where: { id },
           data: dto,
         }),
+    },
+    
+    subscribeTo: {
+      type: new GraphQLNonNull(GraphQLString),
+      args: {
+        userId: { type: new GraphQLNonNull(UUIDType) },
+        authorId: { type: new GraphQLNonNull(UUIDType) },
+      },
+      resolve: async (
+        root,
+        { userId: subscriberId, authorId }: { userId: UUID; authorId: UUID },
+        { prisma }: Context,
+      ) => {
+        await prisma.subscribersOnAuthors.create({
+          data: {
+            subscriberId,
+            authorId,
+          },
+        })
+        return subscriberId;
+      }
+    },
+    unsubscribeFrom: {
+      type: new GraphQLNonNull(UUIDType),
+      args: {
+        userId: { type: new GraphQLNonNull(UUIDType) },
+        authorId: { type: new GraphQLNonNull(UUIDType) },
+      },
+      resolve: async (
+        root,
+        { userId: subscriberId, authorId }: { userId: UUID; authorId: UUID },
+        { prisma }: Context,
+      ) => {
+        await prisma.subscribersOnAuthors.delete({
+          where: {
+            subscriberId_authorId: {
+              subscriberId,
+              authorId,
+            },
+          },
+        });
+        return subscriberId;
+      },
     },
   },
 });
