@@ -1,21 +1,24 @@
-import {
-  GraphQLBoolean,
-  GraphQLInt,
-  GraphQLObjectType,
-} from 'graphql';
+import { GraphQLBoolean, GraphQLInt, GraphQLObjectType } from 'graphql';
 import { UUIDType } from './uuid.js';
-import { UserType } from './user.js';
-import { PostType } from './post.js';
-import { MemberTypeType } from './member-type.js';
+import { MemberTypeType, MemberTypeIdEnum } from './member-type.js';
+import { Context } from './types/interface.js';
+import { ProfileModel } from './types/types.js';
 
 export const ProfileType = new GraphQLObjectType({
-  name: 'ProfileType',
+  name: 'Profile',
   fields: () => ({
     id: { type: UUIDType },
-    userId: { type: UserType.getFields().id.type },
-    memberTypeId: { type: PostType.getFields().id.type },
+    userId: { type: UUIDType },
+    memberTypeId: { type: MemberTypeIdEnum },
     isMale: { type: GraphQLBoolean },
     yearOfBirth: { type: GraphQLInt },
-    memberType: { type: MemberTypeType },
+    memberType: {
+      type: MemberTypeType,
+      resolve: async (root: ProfileModel, args, context: Context) => {
+        return await context.prisma.memberType.findUnique({
+          where: { id: root.memberTypeId },
+        });
+      },
+    },
   }),
 });
