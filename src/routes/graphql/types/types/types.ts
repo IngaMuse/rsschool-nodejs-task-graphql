@@ -27,3 +27,21 @@ export type MemberTypeModel = {
   discount: number;
   postsLimitPerMonth: number;
 };
+
+export type UserDto = {
+  name: string;
+  balance: number;
+};
+
+export type PostDto = {
+  title: string;
+  content: string;
+  authorId: string;
+};
+
+export type ProfileDto = {
+  isMale: boolean;
+  yearOfBirth: number;
+  memberTypeId: 'BASIC' | 'BUSINESS';
+  userId: string;
+};
